@@ -1,1 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator + Riwayat</title>
 
+<style>
+body {
+    background: #121212;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.container {
+    display: flex;
+    gap: 20px;
+}
+
+.calculator {
+    display: grid;
+    grid-template-columns: repeat(4, 75px);
+    grid-template-rows: minmax(100px, auto) repeat(6, 70px);
+    gap: 12px;
+    background: #1e1e1e;
+    padding: 25px;
+    border-radius: 25px;
+}
+
+.display {
+    grid-column: 1 / -1;
+    background: #2d2d2d;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+#previous-operand { color: #888; }
+#current-operand { color: white; font-size: 2rem; font-weight: bold; }
+
+button {
+    cursor: pointer;
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 12px;
+    background: #333;
+    color: white;
+}
+
+button:hover { background: #444; }
+
+.span-two { grid-column: span 2; }
+.span-three { grid-column: span 3; }
+
+.btn-blue { color: #ff4e08; }
+.btn-red { background: #4e2a2a; color: #ff6b6b; }
+.btn-green { background: #342c65; }
+
+/* HISTORY PANEL */
+.history {
+    width: 220px;
+    background: #1e1e1e;
+    border-radius: 20px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+
+    transform: translateX(250px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.history.active {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.history h3 {
+    color: white;
+    margin-bottom: 10px;
+}
+
+.history-list {
+    color: #ccc;
+    font-size: 0.9rem;
+    overflow-y: auto;
+    max-height: 300px;
+}
+
+.clear-btn {
+    margin-top: 10px;
+    background: #c92a2a;
+    color: white;
+    border: none;
+    padding: 8px;
+    border-radius: 10px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="calculator">
+
+<div class="display">
+    <div id="previous-operand"></div>
+    <div id="current-operand">0</div>
+</div>
+
+<button onclick="clearDisplay()" class="span-two btn-red">clear</button>
+<button onclick="deleteNumber()">Delete</button>
+<button onclick="appendOperator('/')">÷</button>
+
+<button onclick="appendNumber('7')">7</button>
+<button onclick="appendNumber('8')">8</button>
+<button onclick="appendNumber('9')">9</button>
+<button onclick="appendOperator('*')">×</button>
+
+<button onclick="appendNumber('4')">4</button>
+<button onclick="appendNumber('5')">5</button>
+<button onclick="appendNumber('6')">6</button>
+<button onclick="appendOperator('+')">+</button>
+
+<button onclick="appendNumber('1')">1</button>
+<button onclick="appendNumber('2')">2</button>
+<button onclick="appendNumber('3')">3</button>
+<button onclick="appendOperator('-')">-</button>
+
+<button onclick="appendNumber('.')">.</button>
+<button onclick="appendNumber('0')">0</button>
+<button onclick="computeSqrt()">√</button>
+<button onclick="appendOperator('%')">%</button>
+
+<button onclick="toggleHistory()" class="btn-blue">H</button>
+<button onclick="calculate()" class="span-three btn-green">=</button>
+
+</div>
+
+<!-- HISTORY -->
+<div class="history" id="historyPanel">
+    <h3>History</h3>
+    <div class="history-list" id="historyList"></div>
+    <button class="clear-btn" onclick="clearHistory()">Delete</button>
+</div>
+
+</div>
+
+<script>
+let currentInput = '0';
+let previousInput = '';
+let operator = null;
+let historyList = [];
+
+const currentDisplay = document.getElementById('current-operand');
+const previousDisplay = document.getElementById('previous-operand');
+const historyPanel = document.getElementById('historyPanel');
+const historyDiv = document.getElementById('historyList');
+
+function updateDisplay() {
+    currentDisplay.innerText = currentInput;
+    previousDisplay.innerText = previousInput + (operator || '');
+}
+
+function appendNumber(num) {
+    if (num === '.' && currentInput.includes('.')) return;
+    if (currentInput === '0' && num !== '.') currentInput = num;
+    else currentInput += num;
+    updateDisplay();
+}
+
+function appendOperator(op) {
+    if (previousInput !== '') calculate();
+    operator = op;
+    previousInput = currentInput;
+    currentInput = '';
+    updateDisplay();
+}
+
+function calculate() {
+    const prev = parseFloat(previousInput);
+    const curr = parseFloat(currentInput);
+    if (isNaN(prev) || isNaN(curr)) return;
+
+    let result;
+    switch (operator) {
+        case '+': result = prev + curr; break;
+        case '-': result = prev - curr; break;
+        case '*': result = prev * curr; break;
+        case '/':
+            if (curr === 0) return alert("Tidak bisa dibagi nol!");
+            result = prev / curr; break;
+        case '%': result = prev % curr; break;
+    }
+
+    const record = `${previousInput} ${operator} ${currentInput} = ${result}`;
+    historyList.push(record);
+    updateHistory();
+
+    currentInput = result.toString();
+    previousInput = '';
+    operator = null;
+    updateDisplay();
+}
+
+function updateHistory() {
+    historyDiv.innerHTML = historyList.map(h => `<div>${h}</div>`).join('');
+}
+
+function toggleHistory() {
+    historyPanel.classList.toggle("active");
+}
+
+function clearHistory() {
+    historyList = [];
+    updateHistory();
+}
+
+function computeSqrt() {
+    const num = parseFloat(currentInput);
+    if (num < 0) return alert("Tidak bisa akar negatif!");
+    currentInput = Math.sqrt(num).toString();
+    updateDisplay();
+}
+
+function clearDisplay() {
+    currentInput = '0';
+    previousInput = '';
+    operator = null;
+    updateDisplay();
+}
+
+function deleteNumber() {
+    currentInput = currentInput.slice(0, -1) || '0';
+    updateDisplay();
+}
+</script>
+
+</body>
+</html>
