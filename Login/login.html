@@ -1,1 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            background: linear-gradient(135deg, #a89dc0, #514ba1);
+        }
 
+        div {
+            text-align: center;
+            border: 5px solid #c5acf9;
+            padding: 50px;
+            border-radius: 40px;
+            background: rgb(245, 244, 245);
+        }
+
+        /* JUDUL LOGIN */
+        h3 {
+            font-weight: bold;
+            font-size: 28px;
+            color: #0d0d0d; 
+            margin-bottom: 25px;
+        }
+
+        /* INPUT */
+        input {
+            display: block;
+            margin: 20px auto;
+            padding: 12px;
+            width: 200px;
+            border-radius: 10px;
+            border: 1px solid #a6a8c0;
+        }
+
+        /* BUTTON */
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: #928deb;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #4b3ca7;
+        }
+
+        #m {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div>
+        <h3>Login</h3>
+        <input id="u" placeholder="Masukan Nama">
+        <input id="p" type="Masukan password" placeholder=" Masukan password">
+        <button onclick="cek()">Login</button>
+        <b id="m"></b>
+    </div>
+
+    <script>
+        function cek() {
+            const ok = (u.value == 'aluna' && p.value == '1919');
+            m.innerText = ok ? "Login Berhasil" : "Login Salah";
+            m.style.color = ok ? "green" : "red";
+        }
+    </script>
+
+</body>
+</html>
